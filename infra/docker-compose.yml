@@ -1,0 +1,21 @@
+# Local PostgreSQL for development. Run: docker compose -f infra/docker-compose.yml up -d
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: finance-db
+    environment:
+      POSTGRES_DB: finance
+      POSTGRES_USER: finance
+      POSTGRES_PASSWORD: finance
+    ports:
+      - "5432:5432"
+    volumes:
+      - finance-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U finance"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  finance-pgdata:

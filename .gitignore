@@ -1,0 +1,23 @@
+# Java / Maven
+backend/target/
+*.class
+
+# Node / Vite
+frontend/node_modules/
+frontend/dist/
+
+# Env & secrets
+.env
+.env.local
+*-service-account*.json
+firebase-credentials*.json
+
+# IDE / OS
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Firebase
+.firebase/

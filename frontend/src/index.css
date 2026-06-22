@@ -1,0 +1,101 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+  html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  html,
+  body {
+    /* Prevent any single element (e.g. a chart SVG) from creating horizontal scroll on mobile. */
+    overflow-x: hidden;
+    max-width: 100%;
+  }
+  body {
+    @apply bg-canvas text-body font-sans;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(60rem 60rem at 110% -10%, rgba(99, 102, 241, 0.07), transparent 60%),
+      radial-gradient(50rem 50rem at -10% 10%, rgba(16, 185, 129, 0.06), transparent 55%);
+    background-attachment: fixed;
+  }
+  #root {
+    width: 100%;
+  }
+  h1,
+  h2,
+  h3 {
+    @apply text-ink;
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-2xl border border-line bg-white p-5 shadow-card;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40;
+  }
+  .btn-primary {
+    @apply btn bg-brand-600 text-white shadow-sm hover:bg-brand-700 disabled:opacity-50;
+  }
+  .btn-ghost {
+    @apply btn border border-line bg-white text-body hover:bg-slate-50;
+  }
+  .input {
+    @apply w-full rounded-xl border border-line bg-white px-3 py-2 text-sm text-ink
+           outline-none transition placeholder:text-muted
+           focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20;
+  }
+  .label {
+    @apply mb-1.5 block text-xs font-medium text-body;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium;
+  }
+  /* Subtle hover elevation for interactive cards/tiles. */
+  .lift {
+    @apply transition duration-200 hover:-translate-y-0.5 hover:shadow-pop;
+  }
+}
+
+@layer utilities {
+  @keyframes fade-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes toast-in {
+    from {
+      opacity: 0;
+      transform: translateX(16px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  /* Page-level entrance animation. */
+  .page {
+    animation: fade-in-up 0.35s ease both;
+  }
+  .toast-in {
+    animation: toast-in 0.25s ease both;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .page,
+    .toast-in {
+      animation: none;
+    }
+  }
+}

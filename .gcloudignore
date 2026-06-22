@@ -1,0 +1,12 @@
+# Files not needed by gcloud-based deploys / image builds.
+.git/
+.gitignore
+*.md
+backend/target/
+frontend/node_modules/
+frontend/dist/
+.claude/
+**/.env
+**/.env.local
+*-service-account*.json
+firebase-credentials*.json

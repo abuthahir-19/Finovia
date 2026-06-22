@@ -1,0 +1,69 @@
+# Cloud Build pipeline: build & test backend, push image, deploy to Cloud Run,
+# then build & deploy the frontend to Firebase Hosting.
+#
+# Substitutions to set in the trigger:
+#   _REGION                 e.g. us-central1
+#   _SERVICE                e.g. finance-api
+#   _AR_REPO                Artifact Registry repo name, e.g. finance
+#   _CLOUD_SQL_CONNECTION   project:region:instance
+#   _DB_NAME, _DB_USER
+# Secrets (from Secret Manager) wired via --update-secrets below: DB_PASSWORD.
+
+steps:
+  # 1. Build the backend image (runs unit/integration tests inside the Dockerfile build stage).
+  - name: gcr.io/cloud-builders/docker
+    id: build-backend
+    args:
+      - build
+      - -t
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPO}/${_SERVICE}:$SHORT_SHA
+      - ./backend
+
+  # 2. Push the image to Artifact Registry.
+  - name: gcr.io/cloud-builders/docker
+    id: push-backend
+    args:
+      - push
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPO}/${_SERVICE}:$SHORT_SHA
+
+  # 3. Deploy to Cloud Run with Cloud SQL + Secret Manager wiring.
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+    id: deploy-backend
+    entrypoint: gcloud
+    args:
+      - run
+      - deploy
+      - ${_SERVICE}
+      - --image=${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPO}/${_SERVICE}:$SHORT_SHA
+      - --region=${_REGION}
+      - --platform=managed
+      - --allow-unauthenticated
+      - --add-cloudsql-instances=${_CLOUD_SQL_CONNECTION}
+      - --set-env-vars=SPRING_PROFILES_ACTIVE=gcp,CLOUD_SQL_CONNECTION_NAME=${_CLOUD_SQL_CONNECTION},DB_NAME=${_DB_NAME},DB_USER=${_DB_USER}
+      - --update-secrets=DB_PASSWORD=db-password:latest
+      - --min-instances=0
+      - --max-instances=10
+      - --cpu=1
+      - --memory=512Mi
+      - --concurrency=80
+
+  # 4. Build & deploy the frontend to Firebase Hosting.
+  - name: node:20
+    id: build-frontend
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        cd frontend
+        npm ci
+        npm run build
+
+  - name: gcr.io/$PROJECT_ID/firebase
+    id: deploy-frontend
+    args: ["deploy", "--only", "hosting", "--project", "$PROJECT_ID"]
+
+images:
+  - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPO}/${_SERVICE}:$SHORT_SHA
+
+options:
+  logging: CLOUD_LOGGING_ONLY
