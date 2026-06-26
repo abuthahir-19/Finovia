@@ -2,7 +2,11 @@ spring:
   application:
     name: finance-api
   datasource:
-    # Local dev defaults; overridden by env vars in Cloud Run (see application-gcp.yml).
+    # Env-driven so the same build runs anywhere. Defaults target the local docker-compose
+    # Postgres. In production (Cloud Run) these env vars point at Neon, e.g.:
+    #   DB_URL=jdbc:postgresql://<endpoint>-pooler.<region>.aws.neon.tech/neondb?sslmode=require
+    #   DB_USER=neondb_owner
+    #   DB_PASSWORD=<from Secret Manager — never commit it>
     url: ${DB_URL:jdbc:postgresql://localhost:5432/finance}
     username: ${DB_USER:finance}
     password: ${DB_PASSWORD:finance}

@@ -8,10 +8,10 @@ pipeline {
 
         // === GCP Configuration ===
         GCP_PROJECT       = "${env.GCP_PROJECT_ID}"
-        REGION            = 'asia-south1'
-        ARTIFACT_REGISTRY = 'asia-south1-docker.pkg.dev'
-        REPO_NAME         = 'finance'
-        CLOUD_RUN_SERVICE = 'finance-api'
+        REGION            = "${env.REGION}"
+        ARTIFACT_REGISTRY = "${env.ARTIFACT_REGISTRY}"
+        REPO_NAME         = "${env.REPO_NAME}"
+        CLOUD_RUN_SERVICE = "${env.CLOUD_RUN_SERVICE}"
 
         // === Control Flags (set to 'true' during initial local testing) ===
         SKIP_GCP_PUSH     = 'false'

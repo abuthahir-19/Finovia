@@ -1,0 +1,22 @@
+# Run Jenkins locally (free) on Docker Desktop:
+#   docker compose -f infra/jenkins/local/docker-compose.yml up -d --build
+# Then open http://localhost:8080 and unlock with:
+#   docker exec finovia-jenkins cat /var/jenkins_home/secrets/initialAdminPassword
+services:
+  jenkins:
+    build: .
+    image: finovia-jenkins-local
+    container_name: finovia-jenkins
+    # Run as root so the container can use the mounted host Docker socket.
+    user: root
+    ports:
+      - "8082:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      # Host Docker daemon — lets the pipeline `docker build`/`push` without DinD.
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
+
+volumes:
+  jenkins_home:

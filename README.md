@@ -34,11 +34,11 @@ statements as PDFs and let the app auto-categorize and record your transactions.
 | ----------- | ---------------------------------------------------------------------------- |
 | Backend     | Java 21 · Spring Boot 3 (Web, Data JPA, Security, Validation, Flyway)         |
 | Auth        | Firebase Authentication (backend verifies ID tokens via Firebase Admin SDK)  |
-| Database    | PostgreSQL (Cloud SQL in production)                                          |
+| Database    | PostgreSQL (Neon free serverless tier in production)                          |
 | Frontend    | React 18 + TypeScript + Vite · Tailwind CSS · TanStack Query · React Router   |
 | Charts / 3D | Recharts · react-three-fiber + drei                                          |
 | PDF import  | Apache PDFBox (server-side statement parsing)                                |
-| Infra       | GCP: Cloud Run · Firebase Hosting · Cloud SQL · Secret Manager · Cloud Build · Jenkins |
+| Infra       | GCP: Cloud Run · Firebase Hosting · Secret Manager · Artifact Registry · Jenkins; Neon (DB) |
 
 ## Architecture
 
@@ -132,44 +132,32 @@ header.
 
 ## Deployment
 
-> **Full step-by-step runbook** (Cloud Run + Firebase Hosting + Cloud SQL + Jenkins CI/CD on a
-> GCE VM): [infra/DEPLOYMENT.md](infra/DEPLOYMENT.md). The [`Jenkinsfile`](Jenkinsfile) defines
-> the pipeline and [infra/jenkins/startup.sh](infra/jenkins/startup.sh) provisions the Jenkins VM.
+A **zero-cost** stack at personal scale: **Cloud Run** (backend, scales to zero / free tier) +
+**Firebase Hosting** & **Auth** (free) + **Neon** free serverless PostgreSQL, with **Jenkins**
+CI/CD on a GCE VM.
 
-### One-time setup
+> **Full step-by-step runbook: [infra/DEPLOYMENT.md](infra/DEPLOYMENT.md).** The
+> [`Jenkinsfile`](Jenkinsfile) defines the pipeline and
+> [infra/jenkins/startup.sh](infra/jenkins/startup.sh) provisions the Jenkins VM.
 
-```bash
-gcloud services enable run.googleapis.com sqladmin.googleapis.com \
-  secretmanager.googleapis.com artifactregistry.googleapis.com cloudbuild.googleapis.com
+### Pipeline at a glance
 
-# Cloud SQL (PostgreSQL)
-gcloud sql instances create finance-pg --database-version=POSTGRES_16 \
-  --tier=db-g1-small --region=us-central1
-gcloud sql databases create finance --instance=finance-pg
-gcloud sql users create finance --instance=finance-pg --password=<STRONG_PWD>
+`mvn clean package` (build + tests) → build Docker image → push to **Artifact Registry** →
+`gcloud run services update` (rolls the new image onto the pre-created Cloud Run service) →
+build frontend → `firebase deploy --only hosting`. Jenkins authenticates with a service-account
+key (`gcp-secret-key` credential).
 
-# Store the DB password in Secret Manager
-printf '<STRONG_PWD>' | gcloud secrets create db-password --data-file=-
+### Database
 
-# Artifact Registry repo
-gcloud artifacts repositories create finance --repository-format=docker --location=us-central1
-```
+The backend talks to **Neon** over a standard SSL JDBC URL via its default Spring profile
+(`DB_URL` / `DB_USER` / `DB_PASSWORD`) — no Cloud SQL, no `gcp` profile, no code changes.
+The runbook covers creating the Neon project and wiring the pooled connection string.
 
-### Build and release
+### Keeping it free
 
-Connect the Cloud Build trigger to your repo using `infra/cloudbuild.yaml` and set the
-substitutions (`_REGION`, `_SERVICE`, `_AR_REPO`, `_CLOUD_SQL_CONNECTION`, `_DB_NAME`,
-`_DB_USER`). On push to `main` it builds and tests the backend, deploys to Cloud Run (wiring
-Cloud SQL + the `db-password` secret), and deploys the frontend to Firebase Hosting.
-
-After the first deploy, set the frontend's `VITE_API_BASE_URL` to the Cloud Run URL and
-restrict the backend's `CORS_ALLOWED_ORIGINS` to your Hosting domain.
-
-### Scaling notes
-
-- Cloud Run scales 0→N; keep `max-instances × DB_POOL_SIZE` under Cloud SQL's connection limit.
-- Cache analytics responses (Cloud CDN / Memorystore Redis) and pre-compute monthly rollups
-  (Cloud Scheduler + Pub/Sub) as traffic grows; add Cloud SQL read replicas for reporting.
+Cloud Run, Hosting, Auth, and Neon all stay within free limits. The only potential GCP charge is
+the Jenkins `e2-medium` VM — **stop it when idle** (`gcloud compute instances stop jenkins`) and
+start it only to deploy, or run Jenkins locally.
 
 ## Security
 

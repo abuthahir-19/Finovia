@@ -11,6 +11,9 @@ frontend/dist/
 .env.local
 *-service-account*.json
 firebase-credentials*.json
+jenkins-deployer-key.json
+*-deployer-key*.json
+*.json.key
 
 # IDE / OS
 .idea/

@@ -20,7 +20,6 @@
     <properties>
         <java.version>21</java.version>
         <firebase-admin.version>9.4.1</firebase-admin.version>
-        <cloud-sql.version>1.20.1</cloud-sql.version>
         <testcontainers.version>1.20.2</testcontainers.version>
     </properties>
 
@@ -66,13 +65,6 @@
             <groupId>com.google.firebase</groupId>
             <artifactId>firebase-admin</artifactId>
             <version>${firebase-admin.version}</version>
-        </dependency>
-
-        <!-- Cloud SQL PostgreSQL Socket Factory (used in GCP; harmless locally) -->
-        <dependency>
-            <groupId>com.google.cloud.sql</groupId>
-            <artifactId>postgres-socket-factory</artifactId>
-            <version>${cloud-sql.version}</version>
         </dependency>
 
         <!-- PDF text extraction for statement import -->
