@@ -1,12 +1,49 @@
 import { Link, NavLink, Outlet } from "react-router-dom";
-import { LayoutDashboard, LogOut, PiggyBank, Receipt, UserRound, Wallet } from "lucide-react";
+import {
+  CircleUserRound,
+  LayoutDashboard,
+  LogOut,
+  PiggyBank,
+  ReceiptText,
+  Wallet,
+} from "lucide-react";
 import { useAuth } from "../auth/AuthContext";
 
+// Each section carries its own accent so the active state is colour-coded to match
+// its page header (Dashboard=indigo, Transactions=sky, Goals=emerald, Account=violet).
 const links = [
-  { to: "/", label: "Dashboard", icon: LayoutDashboard, end: true },
-  { to: "/transactions", label: "Transactions", icon: Receipt, end: false },
-  { to: "/goals", label: "Goals", icon: PiggyBank, end: false },
-  { to: "/profile", label: "Account", icon: UserRound, end: false },
+  {
+    to: "/",
+    label: "Dashboard",
+    icon: LayoutDashboard,
+    end: true,
+    active: "bg-gradient-to-br from-brand-500 to-brand-600 text-white shadow-sm",
+    pill: "bg-brand-50 text-brand-600",
+  },
+  {
+    to: "/transactions",
+    label: "Transactions",
+    icon: ReceiptText,
+    end: false,
+    active: "bg-gradient-to-br from-sky-500 to-sky-600 text-white shadow-sm",
+    pill: "bg-sky-50 text-sky-600",
+  },
+  {
+    to: "/goals",
+    label: "Goals",
+    icon: PiggyBank,
+    end: false,
+    active: "bg-gradient-to-br from-emerald-500 to-emerald-600 text-white shadow-sm",
+    pill: "bg-emerald-50 text-emerald-700",
+  },
+  {
+    to: "/profile",
+    label: "Account",
+    icon: CircleUserRound,
+    end: false,
+    active: "bg-gradient-to-br from-violet-500 to-violet-600 text-white shadow-sm",
+    pill: "bg-violet-50 text-violet-600",
+  },
 ];
 
 export function Layout() {
@@ -32,7 +69,7 @@ export function Layout() {
               end={l.end}
               className={({ isActive }) =>
                 `flex items-center gap-2 rounded-xl px-3.5 py-1.5 text-sm font-medium transition ${
-                  isActive ? "bg-brand-600 text-white shadow-sm" : "text-body hover:bg-slate-50"
+                  isActive ? l.active : "text-body hover:bg-slate-50"
                 }`
               }
             >
@@ -75,14 +112,20 @@ export function Layout() {
               key={l.to}
               to={l.to}
               end={l.end}
-              className={({ isActive }) =>
-                `flex flex-1 flex-col items-center gap-0.5 py-2.5 text-[11px] font-medium transition ${
-                  isActive ? "text-brand-600" : "text-muted"
-                }`
-              }
+              className="flex flex-1 flex-col items-center gap-1 py-2 text-[11px] font-medium transition"
             >
-              <l.icon className="h-5 w-5" />
-              {l.label}
+              {({ isActive }) => (
+                <>
+                  <span
+                    className={`flex h-7 w-12 items-center justify-center rounded-full transition ${
+                      isActive ? l.pill : "text-muted"
+                    }`}
+                  >
+                    <l.icon className="h-5 w-5" />
+                  </span>
+                  <span className={isActive ? l.pill.split(" ")[1] : "text-muted"}>{l.label}</span>
+                </>
+              )}
             </NavLink>
           ))}
         </div>

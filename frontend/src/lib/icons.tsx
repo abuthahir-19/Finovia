@@ -1,25 +1,52 @@
 import {
+  Baby,
+  Banknote,
+  BookOpen,
   Briefcase,
+  Bus,
   Car,
+  Coffee,
+  CreditCard,
+  Droplet,
+  Dumbbell,
   Film,
+  Flame,
+  Fuel,
+  Gamepad2,
+  Gift,
+  GraduationCap,
+  HandCoins,
+  HeartHandshake,
   HeartPulse,
   Home,
+  Landmark,
   Laptop,
   type LucideIcon,
   MoreHorizontal,
+  PawPrint,
+  PiggyBank,
+  Plane,
   Receipt,
+  Repeat,
+  Scissors,
+  ShieldCheck,
+  Shirt,
   ShoppingBag,
   ShoppingCart,
+  Smartphone,
+  Sparkles,
+  Stethoscope,
   TrendingUp,
   Utensils,
   Wallet,
+  Wifi,
   Zap,
 } from "lucide-react";
 import type { TransactionType } from "./types";
 
 /**
- * Maps a category to a meaningful infographic icon. Resolves by the seeded
- * category name first, then falls back to a sensible default per transaction kind.
+ * Exact match for the seeded default categories — guarantees the chosen icon
+ * for the built-in set regardless of keyword overlaps below.
  */
 const BY_NAME: Record<string, LucideIcon> = {
   Groceries: ShoppingCart,
@@ -37,7 +64,119 @@ const BY_NAME: Record<string, LucideIcon> = {
   "Other Income": Wallet,
 };
 
+/**
+ * Case-insensitive keyword fallback so user-created categories still get a
+ * meaningful icon. Ordered most-specific → general; the first substring hit wins.
+ */
+const BY_KEYWORD: [string, LucideIcon][] = [
+  // Food & drink
+  ["grocer", ShoppingCart],
+  ["supermarket", ShoppingCart],
+  ["coffee", Coffee],
+  ["cafe", Coffee],
+  ["restaurant", Utensils],
+  ["dining", Utensils],
+  ["food", Utensils],
+  ["meal", Utensils],
+  // Housing & bills
+  ["rent", Home],
+  ["mortgage", Home],
+  ["hous", Home],
+  ["electric", Zap],
+  ["power", Zap],
+  ["water", Droplet],
+  ["gas", Flame],
+  ["util", Zap],
+  ["internet", Wifi],
+  ["wifi", Wifi],
+  ["broadband", Wifi],
+  ["phone", Smartphone],
+  ["mobile", Smartphone],
+  ["recharge", Smartphone],
+  // Transport
+  ["fuel", Fuel],
+  ["petrol", Fuel],
+  ["diesel", Fuel],
+  ["bus", Bus],
+  ["train", Bus],
+  ["metro", Bus],
+  ["transport", Car],
+  ["transit", Car],
+  ["cab", Car],
+  ["taxi", Car],
+  ["uber", Car],
+  ["ola", Car],
+  ["travel", Plane],
+  ["flight", Plane],
+  ["trip", Plane],
+  ["vacation", Plane],
+  ["hotel", Plane],
+  // Lifestyle
+  ["entertain", Film],
+  ["movie", Film],
+  ["netflix", Film],
+  ["game", Gamepad2],
+  ["gym", Dumbbell],
+  ["fitness", Dumbbell],
+  ["sport", Dumbbell],
+  ["beauty", Sparkles],
+  ["salon", Scissors],
+  ["groom", Scissors],
+  ["cloth", Shirt],
+  ["apparel", Shirt],
+  ["fashion", Shirt],
+  ["shop", ShoppingBag],
+  // Health, family, education
+  ["health", HeartPulse],
+  ["medic", Stethoscope],
+  ["doctor", Stethoscope],
+  ["pharmac", Stethoscope],
+  ["hospital", Stethoscope],
+  ["insur", ShieldCheck],
+  ["education", GraduationCap],
+  ["school", GraduationCap],
+  ["tuition", GraduationCap],
+  ["course", BookOpen],
+  ["book", BookOpen],
+  ["kid", Baby],
+  ["child", Baby],
+  ["baby", Baby],
+  ["pet", PawPrint],
+  ["gift", Gift],
+  ["charit", HeartHandshake],
+  ["donat", HeartHandshake],
+  // Money & finance
+  ["subscription", Repeat],
+  ["member", Repeat],
+  ["card", CreditCard],
+  ["loan", Landmark],
+  ["emi", Landmark],
+  ["tax", Landmark],
+  ["bank", Landmark],
+  ["save", PiggyBank],
+  ["deposit", PiggyBank],
+  ["invest", TrendingUp],
+  ["stock", TrendingUp],
+  ["dividend", TrendingUp],
+  ["mutual", TrendingUp],
+  ["interest", HandCoins],
+  ["bonus", HandCoins],
+  ["refund", HandCoins],
+  ["salary", Briefcase],
+  ["payroll", Briefcase],
+  ["wage", Briefcase],
+  ["freelance", Laptop],
+  ["consult", Laptop],
+  ["cash", Banknote],
+];
+
 export function getCategoryIcon(name: string | null | undefined, kind?: TransactionType): LucideIcon {
-  if (name && BY_NAME[name]) return BY_NAME[name];
+  if (name) {
+    if (BY_NAME[name]) return BY_NAME[name];
+    const lower = name.toLowerCase();
+    for (const [keyword, icon] of BY_KEYWORD) {
+      if (lower.includes(keyword)) return icon;
+    }
+  }
   return kind === "INCOME" ? Wallet : Receipt;
 }

@@ -14,6 +14,7 @@ import {
   Wallet,
 } from "lucide-react";
 import { KpiCard } from "../components/KpiCard";
+import { EmptyState } from "../components/EmptyState";
 import { InsightList } from "../components/InsightList";
 import { SpendByCategoryChart } from "../components/SpendByCategoryChart";
 import { IncomeExpenseChart } from "../components/IncomeExpenseChart";
@@ -101,7 +102,7 @@ export function DashboardPage() {
 
   return (
     <div className="page space-y-6">
-      <div className="relative z-20 rounded-2xl bg-gradient-to-br from-brand-600 to-indigo-500 p-5 text-white shadow-card">
+      <div className="relative z-20 rounded-2xl bg-gradient-to-br from-brand-700 via-brand-600 to-indigo-500 p-5 text-white shadow-pop ring-1 ring-white/10">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <span className="flex h-12 w-12 flex-none items-center justify-center rounded-2xl bg-white/15">
@@ -188,7 +189,7 @@ export function DashboardPage() {
       </section>
 
       {/* Secondary metrics strip */}
-      <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <MiniStat icon={CalendarRange} label="Days in period" value={String(days)} />
         <MiniStat icon={Hash} label="Transactions" value={String(txCount)} />
         <MiniStat icon={TrendingDown} label="Avg spend / day" value={money(avgPerDay)} />
@@ -238,7 +239,7 @@ export function DashboardPage() {
                         </span>
                         <span className="truncate text-ink">{c.category}</span>
                       </span>
-                      <span className="flex-none whitespace-nowrap text-body">
+                      <span className="num flex-none whitespace-nowrap text-body">
                         {money(c.total)} <span className="text-muted">· {pct.toFixed(0)}%</span>
                       </span>
                     </div>
@@ -253,7 +254,7 @@ export function DashboardPage() {
               })}
             </ul>
           ) : (
-            <p className="py-8 text-center text-sm text-muted">No spending in this period.</p>
+            <EmptyState icon={Layers} title="No spending in this period" hint="Expenses you add will break down here by category." />
           )}
         </div>
 
@@ -281,7 +282,7 @@ export function DashboardPage() {
                       </span>
                     </span>
                     <span
-                      className={`flex-none whitespace-nowrap text-sm font-medium ${
+                      className={`num flex-none whitespace-nowrap text-sm font-medium ${
                         t.type === "INCOME" ? "text-income" : "text-expense"
                       }`}
                     >
@@ -293,7 +294,7 @@ export function DashboardPage() {
               })}
             </ul>
           ) : (
-            <p className="py-8 text-center text-sm text-muted">No transactions in this period.</p>
+            <EmptyState icon={Clock} title="No activity yet" hint="Your most recent transactions will appear here." />
           )}
         </div>
       </section>
@@ -319,8 +320,8 @@ function MiniStat({
       </span>
       <div className="min-w-0">
         <p className="text-xs text-muted">{label}</p>
-        <p className="truncate text-base font-semibold text-ink">{value}</p>
-        {sub && <p className="truncate text-xs text-muted">{sub}</p>}
+        <p className="num truncate text-base font-semibold text-ink">{value}</p>
+        {sub && <p className="num truncate text-xs text-muted">{sub}</p>}
       </div>
     </div>
   );

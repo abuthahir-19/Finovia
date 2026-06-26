@@ -8,7 +8,7 @@ import {
   Target,
   Wallet,
 } from "lucide-react";
-import { UserRound } from "lucide-react";
+import { CircleUserRound } from "lucide-react";
 import { useAuth } from "../auth/AuthContext";
 import { useAccountStats, useProfile, useUpdateProfile } from "../lib/hooks";
 import { useMoney } from "../lib/money";
@@ -23,7 +23,7 @@ export function ProfilePage() {
 
   return (
     <div className="page space-y-6">
-      <PageHeader icon={UserRound} title="Account" subtitle="Your profile and lifetime activity" />
+      <PageHeader icon={CircleUserRound} accent="violet" title="Account" subtitle="Your profile and lifetime activity" />
 
       {isLoading || !profile ? (
         <div className="card h-48 animate-pulse" />

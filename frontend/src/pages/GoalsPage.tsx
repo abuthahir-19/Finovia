@@ -17,7 +17,7 @@ export function GoalsPage() {
 
   return (
     <div className="page space-y-6">
-      <PageHeader icon={PiggyBank} title="Savings Goals" subtitle="Track progress toward what matters">
+      <PageHeader icon={PiggyBank} accent="emerald" title="Savings Goals" subtitle="Track progress toward what matters">
         <button className="btn-primary" onClick={() => setCreating(true)}>
           <Plus className="h-4 w-4" />
           New goal

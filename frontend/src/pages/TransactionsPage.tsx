@@ -1,8 +1,9 @@
 import { useMemo, useState } from "react";
-import { Pencil, Receipt, Search, Trash2 } from "lucide-react";
+import { Pencil, Receipt, ReceiptText, Search, Trash2 } from "lucide-react";
 import { ImportStatement } from "../components/ImportStatement";
 import { TransactionForm } from "../components/TransactionForm";
 import { ConfirmDialog } from "../components/ConfirmDialog";
+import { EmptyState } from "../components/EmptyState";
 import { PageHeader } from "../components/PageHeader";
 import { useCategories, useDeleteTransaction, useTransactions } from "../lib/hooks";
 import { useMoney } from "../lib/money";
@@ -46,7 +47,7 @@ export function TransactionsPage() {
   return (
     <div className="page grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
       <div className="min-w-0 space-y-4">
-        <PageHeader icon={Receipt} title="Transactions" subtitle="All your income and expenses" />
+        <PageHeader icon={ReceiptText} accent="sky" title="Transactions" subtitle="All your income and expenses" />
 
         <ImportStatement />
 
@@ -80,11 +81,19 @@ export function TransactionsPage() {
           {isLoading ? (
             <div className="p-6 text-sm text-muted">Loading…</div>
           ) : filtered.length === 0 ? (
-            <div className="p-8 text-center text-sm text-muted">
-              {transactions && transactions.length > 0
-                ? "No transactions match your filters."
-                : "No transactions yet — add your first one below."}
-            </div>
+            transactions && transactions.length > 0 ? (
+              <EmptyState
+                icon={Search}
+                title="No matches"
+                hint="No transactions match your search or filters. Try clearing them."
+              />
+            ) : (
+              <EmptyState
+                icon={Receipt}
+                title="No transactions yet"
+                hint="Add your first income or expense using the form, or import a statement."
+              />
+            )
           ) : (
             <>
               {/* Desktop table — scrolls horizontally within the card if it ever
@@ -121,7 +130,7 @@ export function TransactionsPage() {
                         </td>
                         <td className="px-4 py-3 text-body">{t.description ?? "—"}</td>
                         <td
-                          className={`whitespace-nowrap px-4 py-3 text-right font-semibold ${
+                          className={`num whitespace-nowrap px-4 py-3 text-right font-semibold ${
                             t.type === "INCOME" ? "text-income" : "text-expense"
                           }`}
                         >
@@ -176,7 +185,7 @@ export function TransactionsPage() {
                       </div>
                       <div className="flex flex-none flex-col items-end gap-1">
                         <span
-                          className={`text-sm font-semibold ${
+                          className={`num text-sm font-semibold ${
                             t.type === "INCOME" ? "text-income" : "text-expense"
                           }`}
                         >
