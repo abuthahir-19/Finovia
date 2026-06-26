@@ -44,20 +44,20 @@ export function TransactionsPage() {
   ];
 
   return (
-    <div className="page grid gap-6 lg:grid-cols-[1fr_340px]">
-      <div className="space-y-4">
+    <div className="page grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
+      <div className="min-w-0 space-y-4">
         <PageHeader icon={Receipt} title="Transactions" subtitle="All your income and expenses" />
 
         <ImportStatement />
 
         {/* Filters */}
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex gap-1 rounded-xl bg-slate-100 p-1">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex w-full gap-1 rounded-xl bg-slate-100 p-1 sm:w-auto">
             {tabs.map((tab) => (
               <button
                 key={tab.value}
                 onClick={() => setFilter(tab.value)}
-                className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
+                className={`flex-1 rounded-lg px-3 py-1.5 text-sm font-medium transition sm:flex-none ${
                   filter === tab.value ? "bg-white text-ink shadow-sm" : "text-muted hover:text-body"
                 }`}
               >
@@ -87,8 +87,10 @@ export function TransactionsPage() {
             </div>
           ) : (
             <>
-              {/* Desktop table */}
-              <table className="hidden w-full text-sm md:table">
+              {/* Desktop table — scrolls horizontally within the card if it ever
+                  outgrows the column, instead of being clipped by overflow-hidden. */}
+              <div className="hidden overflow-x-auto md:block">
+              <table className="w-full min-w-[640px] text-sm">
                 <thead className="border-b border-line bg-slate-50/80 text-left text-xs uppercase tracking-wide text-muted">
                   <tr>
                     <th className="px-4 py-3 font-medium">Date</th>
@@ -148,6 +150,7 @@ export function TransactionsPage() {
                   })}
                 </tbody>
               </table>
+              </div>
 
               {/* Mobile card list */}
               <ul className="divide-y divide-line md:hidden">

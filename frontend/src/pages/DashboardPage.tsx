@@ -157,7 +157,7 @@ export function DashboardPage() {
       </div>
 
       {/* Primary KPIs */}
-      <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <KpiCard
           label={salaryMode ? "Salary" : "Income"}
           value={isLoading ? "—" : money(incomeValue)}
@@ -215,7 +215,7 @@ export function DashboardPage() {
 
       {/* Details: top categories + recent activity */}
       <section className="grid gap-4 lg:grid-cols-2">
-        <div className="card">
+        <div className="card min-w-0">
           <div className="mb-4 flex items-center gap-2">
             <Layers className="h-4 w-4 text-brand-600" />
             <h3 className="text-sm font-semibold text-ink">Top spending categories</h3>
@@ -228,17 +228,17 @@ export function DashboardPage() {
                 const barPct = maxCat > 0 ? (c.total / maxCat) * 100 : 0;
                 return (
                   <li key={`${c.categoryId}-${c.category}`}>
-                    <div className="mb-1 flex items-center justify-between text-sm">
-                      <span className="flex items-center gap-2">
+                    <div className="mb-1 flex items-center justify-between gap-2 text-sm">
+                      <span className="flex min-w-0 items-center gap-2">
                         <span
-                          className="flex h-7 w-7 items-center justify-center rounded-lg"
+                          className="flex h-7 w-7 flex-none items-center justify-center rounded-lg"
                           style={{ backgroundColor: `${c.color}1a` }}
                         >
                           <Icon className="h-4 w-4" style={{ color: c.color }} />
                         </span>
-                        <span className="text-ink">{c.category}</span>
+                        <span className="truncate text-ink">{c.category}</span>
                       </span>
-                      <span className="text-body">
+                      <span className="flex-none whitespace-nowrap text-body">
                         {money(c.total)} <span className="text-muted">· {pct.toFixed(0)}%</span>
                       </span>
                     </div>
@@ -257,7 +257,7 @@ export function DashboardPage() {
           )}
         </div>
 
-        <div className="card">
+        <div className="card min-w-0">
           <div className="mb-4 flex items-center gap-2">
             <Clock className="h-4 w-4 text-brand-600" />
             <h3 className="text-sm font-semibold text-ink">Recent activity</h3>
@@ -281,7 +281,7 @@ export function DashboardPage() {
                       </span>
                     </span>
                     <span
-                      className={`flex-none text-sm font-medium ${
+                      className={`flex-none whitespace-nowrap text-sm font-medium ${
                         t.type === "INCOME" ? "text-income" : "text-expense"
                       }`}
                     >

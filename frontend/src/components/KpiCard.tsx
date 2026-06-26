@@ -25,7 +25,7 @@ export function KpiCard({ label, value, icon: Icon, accent = "brand", hint }: Pr
     >
       <div className="min-w-0">
         <p className="text-xs font-medium uppercase tracking-wide text-muted">{label}</p>
-        <p className="mt-2 truncate text-2xl font-semibold text-ink">{value}</p>
+        <p className="mt-2 truncate text-xl font-semibold text-ink sm:text-2xl">{value}</p>
         {hint && <p className="mt-1 truncate text-xs text-muted">{hint}</p>}
       </div>
       <span className={`flex h-11 w-11 flex-none items-center justify-center rounded-xl ${a.chip}`}>
