@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowDownCircle, ArrowUpCircle, Tag } from "lucide-react";
+import { ArrowDownCircle, ArrowUpCircle, Tags } from "lucide-react";
 import { useCategories, useSaveTransaction } from "../lib/hooks";
 import { isoDate } from "../lib/format";
 import { getCategoryIcon } from "../lib/icons";
@@ -25,7 +25,7 @@ export function TransactionForm({ existing, onDone }: Props) {
 
   const visibleCategories = (categories ?? []).filter((c) => c.kind === type);
   const categoryOptions: SelectOption<string>[] = [
-    { value: "", label: "Uncategorized", icon: Tag },
+    { value: "", label: "Uncategorized", icon: Tags },
     ...visibleCategories.map((c) => ({
       value: String(c.id),
       label: c.name,

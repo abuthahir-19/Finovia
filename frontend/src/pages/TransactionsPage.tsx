@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Pencil, Receipt, ReceiptText, Search, Trash2 } from "lucide-react";
+import { CreditCard, Pencil, Receipt, Search, Trash2 } from "lucide-react";
 import { ImportStatement } from "../components/ImportStatement";
 import { TransactionForm } from "../components/TransactionForm";
 import { ConfirmDialog } from "../components/ConfirmDialog";
@@ -47,7 +47,7 @@ export function TransactionsPage() {
   return (
     <div className="page grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
       <div className="min-w-0 space-y-4">
-        <PageHeader icon={ReceiptText} accent="sky" title="Transactions" subtitle="All your income and expenses" />
+        <PageHeader icon={CreditCard} accent="sky" title="Transactions" subtitle="All your income and expenses" />
 
         <ImportStatement />
 

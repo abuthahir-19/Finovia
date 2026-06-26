@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { LineChart, PiggyBank, Wallet } from "lucide-react";
+import { BarChart3, Lightbulb, PiggyBank, Wallet } from "lucide-react";
 import { useAuth } from "../auth/AuthContext";
 
 export function LoginPage() {
@@ -45,9 +45,9 @@ export function LoginPage() {
             </p>
             <ul className="space-y-3">
               {[
-                { icon: LineChart, text: "Visual analytics & spending breakdowns" },
+                { icon: BarChart3, text: "Visual analytics & spending breakdowns" },
                 { icon: PiggyBank, text: "Goal tracking with progress at a glance" },
-                { icon: Wallet, text: "Smart, rule-based budgeting insights" },
+                { icon: Lightbulb, text: "Smart, rule-based budgeting insights" },
               ].map((f) => (
                 <li key={f.text} className="flex items-center gap-3 text-sm text-body">
                   <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white shadow-card">

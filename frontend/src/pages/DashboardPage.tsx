@@ -1,17 +1,18 @@
 import { useMemo, useState } from "react";
 import {
   ArrowDownCircle,
+  ArrowLeftRight,
   ArrowUpCircle,
   CalendarRange,
-  Clock,
-  Hash,
+  Gauge,
+  History,
   Layers,
-  LayoutDashboard,
   PiggyBank,
   Percent,
   TrendingDown,
   Trophy,
   Wallet,
+  type LucideIcon,
 } from "lucide-react";
 import { KpiCard } from "../components/KpiCard";
 import { EmptyState } from "../components/EmptyState";
@@ -106,7 +107,7 @@ export function DashboardPage() {
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <span className="flex h-12 w-12 flex-none items-center justify-center rounded-2xl bg-white/15">
-              <LayoutDashboard className="h-6 w-6" />
+              <Gauge className="h-6 w-6" />
             </span>
             <div>
               <h1 className="text-xl font-semibold leading-tight">
@@ -191,7 +192,7 @@ export function DashboardPage() {
       {/* Secondary metrics strip */}
       <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <MiniStat icon={CalendarRange} label="Days in period" value={String(days)} />
-        <MiniStat icon={Hash} label="Transactions" value={String(txCount)} />
+        <MiniStat icon={ArrowLeftRight} label="Transactions" value={String(txCount)} />
         <MiniStat icon={TrendingDown} label="Avg spend / day" value={money(avgPerDay)} />
         <MiniStat
           icon={Trophy}
@@ -260,7 +261,7 @@ export function DashboardPage() {
 
         <div className="card min-w-0">
           <div className="mb-4 flex items-center gap-2">
-            <Clock className="h-4 w-4 text-brand-600" />
+            <History className="h-4 w-4 text-brand-600" />
             <h3 className="text-sm font-semibold text-ink">Recent activity</h3>
           </div>
           {recent.length > 0 ? (
@@ -294,7 +295,7 @@ export function DashboardPage() {
               })}
             </ul>
           ) : (
-            <EmptyState icon={Clock} title="No activity yet" hint="Your most recent transactions will appear here." />
+            <EmptyState icon={History} title="No activity yet" hint="Your most recent transactions will appear here." />
           )}
         </div>
       </section>
@@ -308,7 +309,7 @@ function MiniStat({
   value,
   sub,
 }: {
-  icon: typeof Hash;
+  icon: LucideIcon;
   label: string;
   value: string;
   sub?: string;

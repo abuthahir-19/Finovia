@@ -3,12 +3,12 @@ import {
   ArrowDownCircle,
   ArrowUpCircle,
   CheckCircle2,
+  CreditCard,
   LogOut,
-  Receipt,
   Target,
+  UserCog,
   Wallet,
 } from "lucide-react";
-import { CircleUserRound } from "lucide-react";
 import { useAuth } from "../auth/AuthContext";
 import { useAccountStats, useProfile, useUpdateProfile } from "../lib/hooks";
 import { useMoney } from "../lib/money";
@@ -23,7 +23,7 @@ export function ProfilePage() {
 
   return (
     <div className="page space-y-6">
-      <PageHeader icon={CircleUserRound} accent="violet" title="Account" subtitle="Your profile and lifetime activity" />
+      <PageHeader icon={UserCog} accent="violet" title="Account" subtitle="Your profile and lifetime activity" />
 
       {isLoading || !profile ? (
         <div className="card h-48 animate-pulse" />
@@ -158,7 +158,7 @@ function StatsPanel() {
     {
       label: "Transactions",
       value: String(stats.transactionCount),
-      icon: Receipt,
+      icon: CreditCard,
       chip: "bg-slate-100",
       color: "text-slate-600",
     },
@@ -184,11 +184,13 @@ function StatsPanel() {
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
         {cards.map((c) => (
           <div key={c.label} className="card lift">
-            <span className={`mb-3 flex h-10 w-10 items-center justify-center rounded-xl ${c.chip}`}>
+            <span
+              className={`mb-3 flex h-10 w-10 items-center justify-center rounded-2xl ring-1 ring-inset ring-black/5 ${c.chip}`}
+            >
               <c.icon className={`h-5 w-5 ${c.color}`} />
             </span>
             <p className="text-xs font-medium uppercase tracking-wide text-muted">{c.label}</p>
-            <p className="mt-1 truncate text-xl font-semibold text-ink">{c.value}</p>
+            <p className="num mt-1 truncate text-xl font-semibold text-ink">{c.value}</p>
           </div>
         ))}
       </div>

@@ -1,12 +1,5 @@
 import { Link, NavLink, Outlet } from "react-router-dom";
-import {
-  CircleUserRound,
-  LayoutDashboard,
-  LogOut,
-  PiggyBank,
-  ReceiptText,
-  Wallet,
-} from "lucide-react";
+import { CreditCard, Gauge, LogOut, PiggyBank, UserCog, Wallet } from "lucide-react";
 import { useAuth } from "../auth/AuthContext";
 
 // Each section carries its own accent so the active state is colour-coded to match
@@ -15,7 +8,7 @@ const links = [
   {
     to: "/",
     label: "Dashboard",
-    icon: LayoutDashboard,
+    icon: Gauge,
     end: true,
     active: "bg-gradient-to-br from-brand-500 to-brand-600 text-white shadow-sm",
     pill: "bg-brand-50 text-brand-600",
@@ -23,7 +16,7 @@ const links = [
   {
     to: "/transactions",
     label: "Transactions",
-    icon: ReceiptText,
+    icon: CreditCard,
     end: false,
     active: "bg-gradient-to-br from-sky-500 to-sky-600 text-white shadow-sm",
     pill: "bg-sky-50 text-sky-600",
@@ -39,7 +32,7 @@ const links = [
   {
     to: "/profile",
     label: "Account",
-    icon: CircleUserRound,
+    icon: UserCog,
     end: false,
     active: "bg-gradient-to-br from-violet-500 to-violet-600 text-white shadow-sm",
     pill: "bg-violet-50 text-violet-600",
