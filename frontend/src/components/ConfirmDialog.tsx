@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import { createPortal } from "react-dom";
 import { AlertTriangle } from "lucide-react";
 
 interface Props {
@@ -20,9 +22,27 @@ export function ConfirmDialog({
   onConfirm,
   onCancel,
 }: Props) {
-  return (
+  // Close on Escape and lock background scroll while the dialog is open.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && !busy) onCancel();
+    };
+    document.addEventListener("keydown", onKey);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [busy, onCancel]);
+
+  // Portal to <body> so an ancestor's CSS transform (e.g. the .page entrance
+  // animation) can't capture our position:fixed and mis-center the dialog.
+  return createPortal(
     <div
-      className="fixed inset-0 z-40 flex items-center justify-center bg-ink/30 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-ink/30 p-4 backdrop-blur-sm"
+      role="dialog"
+      aria-modal="true"
       onClick={onCancel}
     >
       <div
@@ -55,6 +75,7 @@ export function ConfirmDialog({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
