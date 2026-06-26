@@ -1,9 +1,12 @@
 # Finovia — Personal Finance App
 
+🔗 **Live app: [gcp-learning-acnt.web.app](https://gcp-learning-acnt.web.app/)** — sign in with email/password or Google to try it.
+
 A full-stack personal finance app to track expenses, income, and savings goals. An analytics
-engine turns your spending habits into actionable budgeting insights, all presented on a sleek
-dashboard with interactive charts and a subtle animated 3D background. Import bank/UPI
-statements as PDFs and let the app auto-categorize and record your transactions.
+engine turns your spending habits into actionable budgeting insights, all presented on a clean,
+professional, fully responsive dashboard with interactive charts. Track spending since your last
+salary or over any custom date range, and import bank/UPI/GPay statement PDFs to let the app
+auto-categorize and record your transactions.
 
 ## Contents
 
@@ -21,12 +24,19 @@ statements as PDFs and let the app auto-categorize and record your transactions.
 - **Transactions** — full CRUD for expenses and income, organized by category.
 - **Statement import** — upload a bank / UPI / GPay statement PDF; rows are parsed,
   auto-categorized, and saved, with a summary of what was imported and skipped.
-- **Categories** — system defaults seeded per user, plus your own custom categories.
+- **Categories** — system defaults seeded per user, plus your own custom categories; every
+  category resolves to a context-aware icon (keyword-matched, so custom names get one too).
 - **Savings goals** — set targets and track progress with a visual ring.
 - **Analytics** — KPIs, spend-by-category, income-vs-expense, savings trend, and
-  rule-based budgeting insights over any date range.
+  rule-based budgeting insights.
+- **Flexible periods** — view any metric **since your last salary**, for the current month,
+  trailing 3 / 6 / 12 months, or a **custom date range**. "Left from salary" = salary − expenses.
+- **Multi-currency** — base currency per user (defaults to **INR**); all amounts formatted with
+  locale-aware, tabular figures.
 - **Profile** — editable display name and base currency, plus lifetime account stats.
 - **Auth** — email/password and Google sign-in via Firebase, verified server-side.
+- **Polished UI** — clean, professional light theme, fully responsive (mobile bottom-nav +
+  stacked cards down to 360px), with colour-coded sections and rich "analytics" iconography.
 
 ## Tech stack
 
@@ -36,7 +46,7 @@ statements as PDFs and let the app auto-categorize and record your transactions.
 | Auth        | Firebase Authentication (backend verifies ID tokens via Firebase Admin SDK)  |
 | Database    | PostgreSQL (Neon free serverless tier in production)                          |
 | Frontend    | React 18 + TypeScript + Vite · Tailwind CSS · TanStack Query · React Router   |
-| Charts / 3D | Recharts · react-three-fiber + drei                                          |
+| Charts      | Recharts · lucide-react icons                                                |
 | PDF import  | Apache PDFBox (server-side statement parsing)                                |
 | Infra       | GCP: Cloud Run · Firebase Hosting · Secret Manager · Artifact Registry · Jenkins; Neon (DB) |
 
@@ -53,7 +63,7 @@ provisioning) and scope **all** queries by `user_id` for tenant isolation.
 ```
 backend/         Spring Boot API — controllers, services, JPA domain, Flyway migrations
 frontend/        Vite React SPA — pages, charts, auth, API client
-infra/           docker-compose (local Postgres), Cloud Build config, deployment runbook
+infra/           docker-compose (local Postgres), deployment runbook, Jenkins setup (local + VM)
 Jenkinsfile      CI/CD pipeline definition
 firebase.json    Firebase Hosting config
 ```
@@ -133,12 +143,15 @@ header.
 ## Deployment
 
 A **zero-cost** stack at personal scale: **Cloud Run** (backend, scales to zero / free tier) +
-**Firebase Hosting** & **Auth** (free) + **Neon** free serverless PostgreSQL, with **Jenkins**
-CI/CD on a GCE VM.
+**Firebase Hosting** & **Auth** (free) + **Neon** free serverless PostgreSQL. CI/CD runs through
+**Jenkins** — recommended **locally in Docker** (truly $0), exposed to GitHub webhooks via a
+**Cloudflare Tunnel**; running Jenkins on a GCE VM is an optional always-on alternative.
 
 > **Full step-by-step runbook: [infra/DEPLOYMENT.md](infra/DEPLOYMENT.md).** The
-> [`Jenkinsfile`](Jenkinsfile) defines the pipeline and
-> [infra/jenkins/startup.sh](infra/jenkins/startup.sh) provisions the Jenkins VM.
+> [`Jenkinsfile`](Jenkinsfile) defines the pipeline,
+> [infra/jenkins/local/](infra/jenkins/local/) runs Jenkins locally with a Cloudflare Tunnel
+> (see its [README](infra/jenkins/local/README.md)), and
+> [infra/jenkins/startup.sh](infra/jenkins/startup.sh) provisions an optional Jenkins VM.
 
 ### Pipeline at a glance
 
@@ -150,14 +163,18 @@ key (`gcp-secret-key` credential).
 ### Database
 
 The backend talks to **Neon** over a standard SSL JDBC URL via its default Spring profile
-(`DB_URL` / `DB_USER` / `DB_PASSWORD`) — no Cloud SQL, no `gcp` profile, no code changes.
-The runbook covers creating the Neon project and wiring the pooled connection string.
+(`DB_URL` / `DB_USER` / `DB_PASSWORD`) — no Cloud SQL, no `gcp` profile, no code changes. Use
+Neon's **direct** (non-pooled) endpoint with `?sslmode=require`: the app runs Flyway migrations
+at startup, which need session advisory locks that Neon's PgBouncer pooler doesn't support. The
+password is supplied to Cloud Run from **Secret Manager** (`db-password`), never in plaintext.
+The runbook covers creating the Neon project and the one-time Cloud Run service config.
 
 ### Keeping it free
 
-Cloud Run, Hosting, Auth, and Neon all stay within free limits. The only potential GCP charge is
-the Jenkins `e2-medium` VM — **stop it when idle** (`gcloud compute instances stop jenkins`) and
-start it only to deploy, or run Jenkins locally.
+Cloud Run, Hosting, Auth, and Neon all stay within free limits. Running **Jenkins locally in
+Docker** keeps CI/CD at $0 — start it (and the Cloudflare Tunnel) only when you want to deploy.
+If you instead run Jenkins on a GCE `e2-medium` VM, **stop it when idle**
+(`gcloud compute instances stop jenkins`) and start it only to deploy.
 
 ## Security
 
