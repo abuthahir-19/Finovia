@@ -1,7 +1,7 @@
 import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 import { PieChart as PieIcon } from "lucide-react";
 import { useSpendByCategory } from "../lib/hooks";
-import { useMoney } from "../lib/money";
+import { usePrivacyMoney } from "../lib/privacy";
 
 /**
  * Primary graphing component: a donut breakdown of expenses by category.
@@ -9,7 +9,7 @@ import { useMoney } from "../lib/money";
  */
 export function SpendByCategoryChart({ from, to }: { from: string; to: string }) {
   const { data, isLoading } = useSpendByCategory({ from, to });
-  const money = useMoney();
+  const money = usePrivacyMoney();
 
   if (isLoading) {
     return <div className="card h-80 animate-pulse" aria-busy="true" />;

@@ -10,12 +10,12 @@ import {
 } from "recharts";
 import { BarChart3 } from "lucide-react";
 import { useIncomeVsExpense } from "../lib/hooks";
-import { useMoney } from "../lib/money";
+import { usePrivacyMoney } from "../lib/privacy";
 import { tooltipStyle } from "./SpendByCategoryChart";
 
 export function IncomeExpenseChart({ from, to }: { from: string; to: string }) {
   const { data, isLoading } = useIncomeVsExpense({ from, to });
-  const money = useMoney();
+  const money = usePrivacyMoney();
 
   if (isLoading) {
     return <div className="card h-80 animate-pulse" aria-busy="true" />;

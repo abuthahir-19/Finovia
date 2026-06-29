@@ -3,6 +3,7 @@ import { api } from "./api";
 import { notify } from "./toast";
 import type {
   AccountStats,
+  BudgetStatus,
   Category,
   CategorySlice,
   DigestTestResult,
@@ -195,6 +196,40 @@ export function useSavingsTrend(range: Range) {
   });
 }
 
+/* ---- Budgets ---- */
+
+export function useBudgetStatus(range: Range) {
+  return useQuery({
+    queryKey: ["budgets", range],
+    queryFn: () => api.get<BudgetStatus[]>(`/budgets?from=${range.from}&to=${range.to}`),
+  });
+}
+
+export function useSetBudget() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ categoryId, monthlyBudget }: { categoryId: number; monthlyBudget: number }) =>
+      api.put<BudgetStatus>(`/budgets/${categoryId}`, { monthlyBudget }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["budgets"] });
+      notify.success("Budget saved");
+    },
+    onError: (e) => notify.error((e as Error).message),
+  });
+}
+
+export function useDeleteBudget() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (categoryId: number) => api.del(`/budgets/${categoryId}`),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["budgets"] });
+      notify.success("Budget removed");
+    },
+    onError: (e) => notify.error((e as Error).message),
+  });
+}
+
 function invalidateFinancials(qc: ReturnType<typeof useQueryClient>) {
   [
     "transactions",
@@ -204,5 +239,6 @@ function invalidateFinancials(qc: ReturnType<typeof useQueryClient>) {
     "savings-trend",
     "last-salary",
     "account-stats",
+    "budgets",
   ].forEach((key) => qc.invalidateQueries({ queryKey: [key] }));
 }

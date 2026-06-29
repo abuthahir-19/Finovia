@@ -124,3 +124,14 @@ export interface StatementImportResult {
   imported: Transaction[];
   warnings: string[];
 }
+
+export interface BudgetStatus {
+  categoryId: number;
+  categoryName: string;
+  categoryColor: string;
+  monthlyBudget: number;
+  actualSpent: number;
+  remaining: number;
+  usedPct: number;
+  status: "ok" | "warning" | "over";
+}

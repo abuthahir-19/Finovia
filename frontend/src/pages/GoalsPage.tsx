@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Pencil, PiggyBank, Plus, Target, Trash2 } from "lucide-react";
 import { useDeleteGoal, useGoals, useSaveGoal } from "../lib/hooks";
-import { useMoney } from "../lib/money";
+import { usePrivacyMoney } from "../lib/privacy";
 import { ConfirmDialog } from "../components/ConfirmDialog";
 import { PageHeader } from "../components/PageHeader";
 import { ProgressRing } from "../components/ProgressRing";
@@ -10,7 +10,7 @@ import type { SavingsGoal } from "../lib/types";
 export function GoalsPage() {
   const { data: goals, isLoading } = useGoals();
   const del = useDeleteGoal();
-  const money = useMoney();
+  const money = usePrivacyMoney();
   const [editing, setEditing] = useState<SavingsGoal | null>(null);
   const [creating, setCreating] = useState(false);
   const [confirm, setConfirm] = useState<SavingsGoal | null>(null);

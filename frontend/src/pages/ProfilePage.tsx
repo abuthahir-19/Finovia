@@ -18,7 +18,7 @@ import {
   useSendTestDigest,
   useUpdateProfile,
 } from "../lib/hooks";
-import { useMoney } from "../lib/money";
+import { usePrivacyMoney } from "../lib/privacy";
 import { Select } from "../components/Select";
 import { PageHeader } from "../components/PageHeader";
 import type { DigestFrequency, Profile } from "../lib/types";
@@ -154,7 +154,7 @@ function ProfileCard({ profile }: { profile: Profile }) {
 
 function StatsPanel() {
   const { data: stats, isLoading, isError, refetch } = useAccountStats();
-  const money = useMoney();
+  const money = usePrivacyMoney();
 
   if (isLoading) {
     return <div className="card h-64 animate-pulse" />;

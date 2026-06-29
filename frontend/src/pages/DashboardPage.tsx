@@ -28,7 +28,7 @@ import {
   useSummary,
   useTransactions,
 } from "../lib/hooks";
-import { useMoney } from "../lib/money";
+import { usePrivacyMoney } from "../lib/privacy";
 import { getCategoryIcon } from "../lib/icons";
 import { formatPct, formatRangeLabel, monthBounds, todayIso, trailingMonths } from "../lib/format";
 
@@ -41,7 +41,7 @@ function daysBetween(from: string, to: string): number {
 
 export function DashboardPage() {
   const now = new Date();
-  const money = useMoney();
+  const money = usePrivacyMoney();
   const { data: lastSalary } = useLastSalary();
   const { data: profile } = useProfile();
 
@@ -103,7 +103,7 @@ export function DashboardPage() {
 
   return (
     <div className="page space-y-6">
-      <div className="relative z-20 rounded-2xl bg-gradient-to-br from-brand-700 via-brand-600 to-indigo-500 p-5 text-white shadow-pop ring-1 ring-white/10">
+      <div className="relative z-20 rounded-xl bg-gradient-to-br from-brand-700 via-brand-600 to-indigo-500 p-5 text-white shadow-pop ring-1 ring-white/10">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <span className="flex h-12 w-12 flex-none items-center justify-center rounded-2xl bg-white/15">
@@ -233,10 +233,10 @@ export function DashboardPage() {
                     <div className="mb-1 flex items-center justify-between gap-2 text-sm">
                       <span className="flex min-w-0 items-center gap-2">
                         <span
-                          className="flex h-7 w-7 flex-none items-center justify-center rounded-lg"
-                          style={{ backgroundColor: `${c.color}1a` }}
+                          className="flex h-7 w-7 flex-none items-center justify-center rounded-lg ring-1 ring-inset ring-black/[0.05]"
+                          style={{ backgroundColor: `${c.color}22` }}
                         >
-                          <Icon className="h-4 w-4" style={{ color: c.color }} />
+                          <Icon className="h-4 w-4" style={{ color: c.color }} strokeWidth={2} />
                         </span>
                         <span className="truncate text-ink">{c.category}</span>
                       </span>
@@ -272,8 +272,8 @@ export function DashboardPage() {
                 return (
                   <li key={t.id} className="flex items-center justify-between gap-3 py-2.5">
                     <span className="flex min-w-0 items-center gap-2.5">
-                      <span className="flex h-8 w-8 flex-none items-center justify-center rounded-lg bg-slate-100">
-                        <Icon className="h-4 w-4 text-slate-500" />
+                      <span className="flex h-8 w-8 flex-none items-center justify-center rounded-lg bg-gradient-to-br from-slate-100 to-slate-50 ring-1 ring-inset ring-slate-200/60">
+                        <Icon className="h-4 w-4 text-slate-500" strokeWidth={1.75} />
                       </span>
                       <span className="min-w-0">
                         <span className="block truncate text-sm text-ink">
@@ -316,8 +316,8 @@ function MiniStat({
 }) {
   return (
     <div className="card lift flex items-center gap-3 py-4">
-      <span className="flex h-9 w-9 flex-none items-center justify-center rounded-xl bg-slate-100">
-        <Icon className="h-4 w-4 text-slate-500" />
+      <span className="flex h-9 w-9 flex-none items-center justify-center rounded-xl bg-gradient-to-br from-slate-100 to-slate-50 ring-1 ring-inset ring-slate-200/60">
+        <Icon className="h-4 w-4 text-slate-500" strokeWidth={2} />
       </span>
       <div className="min-w-0">
         <p className="text-xs text-muted">{label}</p>

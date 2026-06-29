@@ -6,7 +6,7 @@ import { ConfirmDialog } from "../components/ConfirmDialog";
 import { EmptyState } from "../components/EmptyState";
 import { PageHeader } from "../components/PageHeader";
 import { useCategories, useDeleteTransaction, useTransactions } from "../lib/hooks";
-import { useMoney } from "../lib/money";
+import { usePrivacyMoney } from "../lib/privacy";
 import { getCategoryIcon } from "../lib/icons";
 import type { Category, Transaction, TransactionType } from "../lib/types";
 
@@ -16,7 +16,7 @@ export function TransactionsPage() {
   const { data: transactions, isLoading } = useTransactions();
   const { data: categories } = useCategories();
   const del = useDeleteTransaction();
-  const money = useMoney();
+  const money = usePrivacyMoney();
   const [editing, setEditing] = useState<Transaction | null>(null);
   const [confirm, setConfirm] = useState<Transaction | null>(null);
   const [query, setQuery] = useState("");
