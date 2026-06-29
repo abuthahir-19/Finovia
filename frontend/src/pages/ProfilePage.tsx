@@ -5,16 +5,23 @@ import {
   CheckCircle2,
   CreditCard,
   LogOut,
+  Mail,
+  Send,
   Target,
   UserCog,
   Wallet,
 } from "lucide-react";
 import { useAuth } from "../auth/AuthContext";
-import { useAccountStats, useProfile, useUpdateProfile } from "../lib/hooks";
+import {
+  useAccountStats,
+  useProfile,
+  useSendTestDigest,
+  useUpdateProfile,
+} from "../lib/hooks";
 import { useMoney } from "../lib/money";
 import { Select } from "../components/Select";
 import { PageHeader } from "../components/PageHeader";
-import type { Profile } from "../lib/types";
+import type { DigestFrequency, Profile } from "../lib/types";
 
 const CURRENCIES = ["INR", "USD", "EUR", "GBP", "AED", "AUD", "CAD", "SGD", "JPY"];
 
@@ -40,12 +47,17 @@ export function ProfilePage() {
 function ProfileCard({ profile }: { profile: Profile }) {
   const { user, logout } = useAuth();
   const update = useUpdateProfile();
+  const sendTest = useSendTestDigest();
 
   const [displayName, setDisplayName] = useState(profile.displayName ?? "");
   const [currency, setCurrency] = useState(profile.baseCurrency ?? "INR");
+  const [digest, setDigest] = useState<DigestFrequency>(profile.digestFrequency ?? "NONE");
   const [saved, setSaved] = useState(false);
 
-  const dirty = displayName !== (profile.displayName ?? "") || currency !== profile.baseCurrency;
+  const dirty =
+    displayName !== (profile.displayName ?? "") ||
+    currency !== profile.baseCurrency ||
+    digest !== (profile.digestFrequency ?? "NONE");
   const initial = (profile.displayName || profile.email || "?").charAt(0).toUpperCase();
   const created = profile.createdAt ? new Date(profile.createdAt) : null;
   const memberSince =
@@ -54,7 +66,7 @@ function ProfileCard({ profile }: { profile: Profile }) {
       : null;
 
   async function save() {
-    await update.mutateAsync({ displayName, baseCurrency: currency });
+    await update.mutateAsync({ displayName, baseCurrency: currency, digestFrequency: digest });
     setSaved(true);
     setTimeout(() => setSaved(false), 2500);
   }
@@ -92,6 +104,35 @@ function ProfileCard({ profile }: { profile: Profile }) {
             options={CURRENCIES.map((c) => ({ value: c, label: c }))}
           />
           <p className="mt-1 text-xs text-muted">Used to display all amounts across the app.</p>
+        </div>
+
+        <div>
+          <label className="label flex items-center gap-1.5">
+            <Mail className="h-3.5 w-3.5 text-muted" />
+            Email digest
+          </label>
+          <Select
+            ariaLabel="Email digest frequency"
+            value={digest}
+            onChange={(v) => setDigest(v as DigestFrequency)}
+            options={[
+              { value: "NONE", label: "Off" },
+              { value: "WEEKLY", label: "Weekly summary" },
+              { value: "MONTHLY", label: "Monthly summary" },
+            ]}
+          />
+          <p className="mt-1 text-xs text-muted">
+            Get a summary of your income, spending, and insights emailed to {profile.email}.
+          </p>
+          <button
+            type="button"
+            className="btn-ghost mt-2 w-full text-sm"
+            disabled={sendTest.isPending}
+            onClick={() => sendTest.mutate()}
+          >
+            <Send className="h-4 w-4" />
+            {sendTest.isPending ? "Sending…" : "Send me a test digest"}
+          </button>
         </div>
 
         {update.isError && (

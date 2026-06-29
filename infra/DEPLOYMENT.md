@@ -190,6 +190,9 @@ Grab the URL: `gcloud run services describe finance-api --region $REGION --forma
 > `DB_URL`/`DB_USER`/`DB_PASSWORD`, so no code changes. **If you later scale up**, switch `DB_URL`
 > to the `-pooler` host and set `spring.flyway.url` to the direct host so migrations still work.
 
+> **Email digest (optional):** to enable the weekly/monthly digest emails, add the mail + digest
+> env vars and secrets to this service and create the scheduler jobs — see **§12** below.
+
 ## 10. Run the pipeline
 Click **Build Now**. Stages: checkout → `mvn clean package` (build + tests) → build Docker image (`./backend`) → push to Artifact Registry → `gcloud run services update` (rolls the new image) → build frontend → `firebase deploy --only hosting`.
 
@@ -199,7 +202,66 @@ After the first run, put the real Cloud Run URL into the `finovia-frontend-env` 
 - `https://<cloud-run-url>/actuator/health` → `{"status":"UP"}`.
 - `curl https://<cloud-run-url>/api/transactions` with no token → **401** (auth working).
 - Open `https://YOUR_PROJECT.web.app`, sign in, add a transaction, see the dashboard update.
-- Flyway migrations (V1–V4) run automatically on container startup — check Cloud Run logs.
+- Flyway migrations (V1–V5) run automatically on container startup — check Cloud Run logs.
+
+---
+
+## 12. Email digest (weekly/monthly) — optional, free
+
+Users opt into a **weekly** or **monthly** summary email from the **Account** page. Delivery needs
+an SMTP provider and a scheduler to trigger the runs. Everything below stays within free tiers.
+
+### 12a. Pick an SMTP provider
+Any SMTP works. **Brevo** (formerly Sendinblue) has a free tier (~300 emails/day):
+host `smtp-relay.brevo.com`, port `587`, with a generated SMTP key as the password. (Gmail with an
+app password also works for low volume.)
+
+### 12b. Store the SMTP password + a digest token as secrets
+```bash
+printf '%s' 'YOUR_SMTP_PASSWORD' | gcloud secrets create mail-password --data-file=- --project $PROJECT_ID
+# A long random shared secret that protects the internal trigger endpoint:
+openssl rand -hex 32 | tr -d '\n' | gcloud secrets create digest-token --data-file=- --project $PROJECT_ID
+# Let the Cloud Run runtime SA read them:
+for s in mail-password digest-token; do
+  gcloud secrets add-iam-policy-binding $s --project $PROJECT_ID \
+    --member "serviceAccount:finance-run@$PROJECT_ID.iam.gserviceaccount.com" \
+    --role roles/secretmanager.secretAccessor
+done
+```
+
+### 12c. Add the mail config to the Cloud Run service
+```bash
+gcloud run services update finance-api --project $PROJECT_ID --region $REGION \
+  --update-env-vars "MAIL_ENABLED=true,MAIL_HOST=smtp-relay.brevo.com,MAIL_PORT=587,MAIL_USERNAME=YOUR_SMTP_LOGIN,MAIL_FROM=no-reply@yourdomain.com,MAIL_FROM_NAME=Finovia,PUBLIC_URL=https://$PROJECT_ID.web.app" \
+  --update-secrets "MAIL_PASSWORD=mail-password:latest,DIGEST_TOKEN=digest-token:latest"
+```
+Verify from the app: **Account → Email digest → "Send me a test digest"** should arrive in your inbox.
+
+### 12d. Schedule the runs with Cloud Scheduler (free: ≤3 jobs)
+The endpoint is `POST /api/internal/digests/run?frequency=WEEKLY|MONTHLY`, gated by the
+`X-Digest-Token` header. Read the token, then create two jobs:
+```bash
+TOKEN=$(gcloud secrets versions access latest --secret digest-token --project $PROJECT_ID)
+URL=$(gcloud run services describe finance-api --project $PROJECT_ID --region $REGION --format='value(status.url)')
+
+# Weekly — Mondays 08:00 IST
+gcloud scheduler jobs create http finovia-digest-weekly --project $PROJECT_ID --location $REGION \
+  --schedule "0 8 * * 1" --time-zone "Asia/Kolkata" --http-method POST \
+  --uri "$URL/api/internal/digests/run?frequency=WEEKLY" \
+  --headers "X-Digest-Token=$TOKEN"
+
+# Monthly — 1st of month 08:00 IST
+gcloud scheduler jobs create http finovia-digest-monthly --project $PROJECT_ID --location $REGION \
+  --schedule "0 8 1 * *" --time-zone "Asia/Kolkata" --http-method POST \
+  --uri "$URL/api/internal/digests/run?frequency=MONTHLY" \
+  --headers "X-Digest-Token=$TOKEN"
+```
+Each run returns `{"frequency","recipients","sent","skipped"}`. Users with no activity in the
+period are skipped (no empty emails). To disable email, set `MAIL_ENABLED=false` (or remove the
+scheduler jobs); the app runs fine without it.
+
+> **Local dev:** leave `MAIL_*` unset and email is simply skipped (logged, never fails). To test
+> locally, set `MAIL_ENABLED=true` + the `MAIL_*`/`DIGEST_TOKEN` env vars in your run config.
 
 ---
 

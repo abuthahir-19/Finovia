@@ -35,6 +35,8 @@ public class SecurityConfig {
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/health/**", "/actuator/info").permitAll()
+                        // Scheduler-triggered digest run; gated by a shared-secret header in the controller.
+                        .requestMatchers("/api/internal/**").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(firebaseTokenFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();

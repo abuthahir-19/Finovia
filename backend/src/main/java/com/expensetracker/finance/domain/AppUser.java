@@ -2,6 +2,8 @@ package com.expensetracker.finance.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -28,6 +30,13 @@ public class AppUser {
 
     @Column(name = "base_currency", nullable = false, length = 3)
     private String baseCurrency = "INR";
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "digest_frequency", nullable = false, length = 10)
+    private DigestFrequency digestFrequency = DigestFrequency.NONE;
+
+    @Column(name = "last_digest_sent_at")
+    private Instant lastDigestSentAt;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt = Instant.now();
@@ -78,6 +87,22 @@ public class AppUser {
 
     public void setBaseCurrency(String baseCurrency) {
         this.baseCurrency = baseCurrency;
+    }
+
+    public DigestFrequency getDigestFrequency() {
+        return digestFrequency;
+    }
+
+    public void setDigestFrequency(DigestFrequency digestFrequency) {
+        this.digestFrequency = digestFrequency;
+    }
+
+    public Instant getLastDigestSentAt() {
+        return lastDigestSentAt;
+    }
+
+    public void setLastDigestSentAt(Instant lastDigestSentAt) {
+        this.lastDigestSentAt = lastDigestSentAt;
     }
 
     public void touch() {

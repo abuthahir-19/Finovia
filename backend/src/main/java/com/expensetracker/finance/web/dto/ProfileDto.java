@@ -9,11 +9,12 @@ public record ProfileDto(
         String email,
         String displayName,
         String baseCurrency,
+        String digestFrequency,
         Instant createdAt
 ) {
     public static ProfileDto from(AppUser u) {
         return new ProfileDto(u.getId(), u.getEmail(),
                 u.getDisplayName() == null ? "" : u.getDisplayName(),
-                u.getBaseCurrency(), u.getCreatedAt());
+                u.getBaseCurrency(), u.getDigestFrequency().name(), u.getCreatedAt());
     }
 }

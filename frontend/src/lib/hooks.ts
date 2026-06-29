@@ -5,6 +5,7 @@ import type {
   AccountStats,
   Category,
   CategorySlice,
+  DigestTestResult,
   LastSalary,
   MonthlyPoint,
   Profile,
@@ -144,6 +145,14 @@ export function useAccountStats() {
   return useQuery({
     queryKey: ["account-stats"],
     queryFn: () => api.get<AccountStats>("/me/stats"),
+  });
+}
+
+export function useSendTestDigest() {
+  return useMutation({
+    mutationFn: () => api.post<DigestTestResult>("/me/digest/test", {}),
+    onSuccess: (res) => (res.sent ? notify.success(res.message) : notify.error(res.message)),
+    onError: (e) => notify.error((e as Error).message),
   });
 }
 

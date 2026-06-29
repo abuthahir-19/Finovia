@@ -85,17 +85,27 @@ export interface LastSalary {
   amount: number;
 }
 
+export type DigestFrequency = "NONE" | "WEEKLY" | "MONTHLY";
+
 export interface Profile {
   id: number;
   email: string;
   displayName: string;
   baseCurrency: string;
+  digestFrequency: DigestFrequency;
   createdAt: string;
 }
 
 export interface UpdateProfileRequest {
   displayName?: string;
   baseCurrency?: string;
+  digestFrequency?: DigestFrequency;
+}
+
+export interface DigestTestResult {
+  sent: boolean;
+  emailEnabled: boolean;
+  message: string;
 }
 
 export interface AccountStats {

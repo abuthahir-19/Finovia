@@ -33,7 +33,10 @@ auto-categorize and record your transactions.
   trailing 3 / 6 / 12 months, or a **custom date range**. "Left from salary" = salary − expenses.
 - **Multi-currency** — base currency per user (defaults to **INR**); all amounts formatted with
   locale-aware, tabular figures.
-- **Profile** — editable display name and base currency, plus lifetime account stats.
+- **Email digest** — opt into a **weekly** or **monthly** summary email (income, spending, top
+  categories, and insights) delivered via SMTP and triggered by Cloud Scheduler; "send test" from
+  the Account page. Degrades gracefully when email isn't configured.
+- **Profile** — editable display name, base currency, and digest preference, plus lifetime stats.
 - **Auth** — email/password and Google sign-in via Firebase, verified server-side.
 - **Polished UI** — clean, professional light theme, fully responsive (mobile bottom-nav +
   stacked cards down to 360px), with colour-coded sections and rich "analytics" iconography.
@@ -119,14 +122,17 @@ cd frontend && npm test          # Vitest
 
 ## API reference
 
-All endpoints (except `/actuator/health`) require an `Authorization: Bearer <Firebase ID token>`
-header.
+All endpoints (except `/actuator/health` and `/api/internal/**`) require an
+`Authorization: Bearer <Firebase ID token>` header. The `/api/internal/**` digest trigger is
+instead protected by a shared-secret `X-Digest-Token` header (for Cloud Scheduler).
 
 | Method                | Path                               | Purpose                                  |
 | --------------------- | ---------------------------------- | ---------------------------------------- |
 | `GET`                 | `/api/me`                          | Current user (provisions on first call)  |
-| `PUT`                 | `/api/me`                          | Update display name / base currency      |
+| `PUT`                 | `/api/me`                          | Update display name / currency / digest  |
 | `GET`                 | `/api/me/stats`                    | Lifetime account statistics              |
+| `POST`                | `/api/me/digest/test`              | Send the current user a test digest now  |
+| `POST`                | `/api/internal/digests/run`        | Scheduler-triggered digest run (token)   |
 | `GET POST PUT DELETE` | `/api/transactions[/{id}]`         | Expense / income CRUD                    |
 | `POST`                | `/api/transactions/import`         | Import transactions from a statement PDF |
 | `GET POST PUT DELETE` | `/api/categories[/{id}]`           | Categories (system defaults seeded)      |

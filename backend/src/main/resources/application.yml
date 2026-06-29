@@ -12,6 +12,19 @@ spring:
     password: ${DB_PASSWORD:finance}
     hikari:
       maximum-pool-size: ${DB_POOL_SIZE:5}
+  # SMTP for the email digest. Leave MAIL_HOST unset to disable email (sends are skipped, app still runs).
+  # Example (Brevo free tier): MAIL_HOST=smtp-relay.brevo.com MAIL_PORT=587 plus MAIL_USERNAME / MAIL_PASSWORD.
+  mail:
+    host: ${MAIL_HOST:}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
   jpa:
     hibernate:
       ddl-auto: validate
@@ -38,6 +51,17 @@ firebase:
 app:
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}
+  # Public SPA URL used in digest email links.
+  public-url: ${PUBLIC_URL:https://gcp-learning-acnt.web.app}
+  mail:
+    # Master switch for outbound email. Set MAIL_ENABLED=true once SMTP env vars are configured.
+    enabled: ${MAIL_ENABLED:false}
+    from: ${MAIL_FROM:no-reply@finovia.app}
+    from-name: ${MAIL_FROM_NAME:Finovia}
+  digest:
+    # Shared secret required (X-Digest-Token header) to trigger /api/internal/digests/run.
+    # Leave unset to disable scheduled runs.
+    token: ${DIGEST_TOKEN:}
 
 management:
   endpoints:

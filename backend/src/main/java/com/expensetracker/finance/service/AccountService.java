@@ -2,6 +2,7 @@ package com.expensetracker.finance.service;
 
 import com.expensetracker.finance.domain.AppUser;
 import com.expensetracker.finance.domain.AppUserRepository;
+import com.expensetracker.finance.domain.DigestFrequency;
 import com.expensetracker.finance.domain.GoalStatus;
 import com.expensetracker.finance.domain.SavingsGoalRepository;
 import com.expensetracker.finance.domain.TransactionRepository;
@@ -37,6 +38,9 @@ public class AccountService {
         }
         if (StringUtils.hasText(req.baseCurrency())) {
             user.setBaseCurrency(req.baseCurrency().toUpperCase());
+        }
+        if (StringUtils.hasText(req.digestFrequency())) {
+            user.setDigestFrequency(DigestFrequency.valueOf(req.digestFrequency().toUpperCase()));
         }
         user.touch();
         return ProfileDto.from(users.save(user)); // merge detached entity + persist
