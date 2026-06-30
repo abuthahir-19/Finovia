@@ -8,6 +8,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -34,9 +35,15 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/actuator/health/**", "/actuator/info").permitAll()
+                        // Use ant matchers explicitly to avoid MvcRequestMatcher ambiguity.
+                        // NOTE: "/error" must be permitted — when any endpoint errors (even a
+                        // permitAll one), Spring forwards to /error to render it; if that path
+                        // isn't permitted it is denied with 403, masking the real status.
+                        .requestMatchers(AntPathRequestMatcher.antMatcher("/error"),
+                                AntPathRequestMatcher.antMatcher("/actuator/health/**"),
+                                AntPathRequestMatcher.antMatcher("/actuator/info")).permitAll()
                         // Scheduler-triggered digest run; gated by a shared-secret header in the controller.
-                        .requestMatchers("/api/internal/**").permitAll()
+                        .requestMatchers(AntPathRequestMatcher.antMatcher("/api/internal/**")).permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(firebaseTokenFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
