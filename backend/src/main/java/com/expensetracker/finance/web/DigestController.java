@@ -36,11 +36,16 @@ public class DigestController {
     @PostMapping("/run")
     public DigestRunResultDto run(@RequestParam DigestFrequency frequency,
                                   @RequestHeader(value = "X-Digest-Token", required = false) String token) {
-        if (configuredToken == null || configuredToken.isBlank()) {
+        // Trim both sides: secrets stored in Secret Manager often carry a trailing newline,
+        // which Cloud Run feeds verbatim into the env var, while callers send the value without
+        // it — a raw equals() would then mismatch (401) even with the "same" token.
+        String expected = configuredToken == null ? "" : configuredToken.trim();
+        if (expected.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE,
                     "Digest runs are disabled (no app.digest.token configured).");
         }
-        if (!configuredToken.equals(token)) {
+        String provided = token == null ? "" : token.trim();
+        if (!expected.equals(provided)) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid digest token.");
         }
         return digestService.runDigests(frequency);
