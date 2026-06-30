@@ -1,6 +1,7 @@
 package com.expensetracker.finance.web;
 
 import com.expensetracker.finance.security.FirebaseUserPrincipal;
+import com.expensetracker.finance.service.BudgetAlertService;
 import com.expensetracker.finance.service.CurrentUserService;
 import com.expensetracker.finance.service.TransactionService;
 import com.expensetracker.finance.service.imports.StatementImportService;
@@ -32,15 +33,17 @@ import java.util.List;
 @RequestMapping("/api/transactions")
 public class TransactionController {
 
-    private final TransactionService service;
-    private final CurrentUserService currentUser;
+    private final TransactionService     service;
+    private final CurrentUserService     currentUser;
     private final StatementImportService importService;
+    private final BudgetAlertService     budgetAlert;
 
     public TransactionController(TransactionService service, CurrentUserService currentUser,
-                                 StatementImportService importService) {
-        this.service = service;
-        this.currentUser = currentUser;
+                                 StatementImportService importService, BudgetAlertService budgetAlert) {
+        this.service      = service;
+        this.currentUser  = currentUser;
         this.importService = importService;
+        this.budgetAlert  = budgetAlert;
     }
 
     @GetMapping
@@ -55,14 +58,20 @@ public class TransactionController {
     @ResponseStatus(HttpStatus.CREATED)
     public TransactionDto create(@AuthenticationPrincipal FirebaseUserPrincipal principal,
                                  @Valid @RequestBody TransactionRequest body) {
-        return service.create(currentUser.resolveId(principal), body);
+        Long userId = currentUser.resolveId(principal);
+        TransactionDto result = service.create(userId, body);
+        budgetAlert.checkAndNotify(userId);
+        return result;
     }
 
     @PutMapping("/{id}")
     public TransactionDto update(@AuthenticationPrincipal FirebaseUserPrincipal principal,
                                  @PathVariable Long id,
                                  @Valid @RequestBody TransactionRequest body) {
-        return service.update(currentUser.resolveId(principal), id, body);
+        Long userId = currentUser.resolveId(principal);
+        TransactionDto result = service.update(userId, id, body);
+        budgetAlert.checkAndNotify(userId);
+        return result;
     }
 
     @DeleteMapping("/{id}")

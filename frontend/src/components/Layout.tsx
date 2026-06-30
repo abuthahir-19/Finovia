@@ -137,13 +137,13 @@ export function Layout() {
         className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-white/95 backdrop-blur-md md:hidden"
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       >
-        <div className="mx-auto flex max-w-6xl items-stretch justify-around px-2">
+        <div className="grid w-full grid-cols-5">
           {links.map((l) => (
             <NavLink
               key={l.to}
               to={l.to}
               end={l.end}
-              className="flex flex-1 flex-col items-center gap-0.5 py-2 text-[11px] font-medium transition"
+              className="flex flex-col items-center gap-0.5 py-2 text-[11px] font-medium transition"
             >
               {({ isActive }) => (
                 <>

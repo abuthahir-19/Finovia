@@ -62,6 +62,15 @@ const BY_NAME: Record<string, LucideIcon> = {
   Freelance: Laptop,
   Investments: TrendingUp,
   "Other Income": Wallet,
+  // Personal transport
+  Rapido: Car,
+  "Bike Petrol": Fuel,
+  "Bike Expense": Car,
+  // Meal categories
+  Breakfast: Coffee,
+  Lunch: Utensils,
+  Dinner: Utensils,
+  Snacks: Coffee,
 };
 
 /**

@@ -22,6 +22,12 @@ public class CategoryBudget {
     @Column(name = "monthly_budget", nullable = false, precision = 14, scale = 2)
     private BigDecimal monthlyBudget;
 
+    @Column(name = "last_notified_pct", nullable = false)
+    private int lastNotifiedPct = 0;
+
+    @Column(name = "last_notified_month", length = 7)
+    private String lastNotifiedMonth;
+
     protected CategoryBudget() {}
 
     public CategoryBudget(Long userId, Long categoryId, BigDecimal monthlyBudget) {
@@ -35,4 +41,9 @@ public class CategoryBudget {
     public Long getCategoryId()            { return categoryId; }
     public BigDecimal getMonthlyBudget()   { return monthlyBudget; }
     public void setMonthlyBudget(BigDecimal monthlyBudget) { this.monthlyBudget = monthlyBudget; }
+
+    public int getLastNotifiedPct()                   { return lastNotifiedPct; }
+    public void setLastNotifiedPct(int pct)           { this.lastNotifiedPct = pct; }
+    public String getLastNotifiedMonth()              { return lastNotifiedMonth; }
+    public void setLastNotifiedMonth(String month)    { this.lastNotifiedMonth = month; }
 }
